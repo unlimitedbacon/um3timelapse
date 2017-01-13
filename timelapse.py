@@ -1,6 +1,7 @@
 #!/bin/python3
 import os
 import argparse
+from requests import exceptions
 from tempfile import mkdtemp
 from time import sleep
 from urllib.request import urlopen
@@ -22,19 +23,38 @@ api = Ultimaker3(options.HOST, "Timelapse")
 #api.loadAuth("auth.data")
 
 def printing():
-	status = api.get("api/v1/printer/status").content
-	if status == b'"printing"':
-		state = api.get("api/v1/print_job/state").content
-		if state == b'"wait_cleanup"':
-			return False
-		else:
-			return True
-	else:
-		return False
+	status = None
+	# If the printer gets disconnected, retry indefinitely
+	while status == None:
+		try:
+			status = api.get("api/v1/printer/status").json()
+			if status == 'printing':
+				state = api.get("api/v1/print_job/state").json()
+				if state == 'wait_cleanup':
+					return False
+				else:
+					return True
+			else:
+				return False
+		except exceptions.ConnectionError as err:
+			status = None
+			print_error(err)
 
 def progress():
-	p = float(api.get("api/v1/print_job/progress").content) * 100
-	return "%05.2f %%" % (p)
+	p = None
+	# If the printer gets disconnected, retry indefinitely
+	while p == None:
+		try:
+			p = api.get("api/v1/print_job/progress").json() * 100
+			return "%05.2f %%" % (p)
+		except exceptions.ConnectionError as err:
+			print_error(err)
+
+def print_error(err):
+	print("Connection error: {0}".format(err))
+	print("Retrying")
+	print()
+	sleep(1)
 
 tmpdir = mkdtemp()
 filenameformat = os.path.join(tmpdir, "%05d.jpg")
