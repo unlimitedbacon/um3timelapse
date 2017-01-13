@@ -3,6 +3,8 @@ Ultimaker 3 Timelapse Maker
 
 A script that makes timelapse videos from the onboard camera on your Ultimaker 3.
 
+![Bulbasaur](https://thumbs.gfycat.com/EntireGlassAlaskanmalamute-size_restricted.gif)
+
 Usage
 -----
 ```
