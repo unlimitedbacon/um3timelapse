@@ -16,7 +16,7 @@ import requests
 import json
 import os
 import time
-import pwd
+from getpass import getuser
 
 ## Ultimaker 3 API access class.
 #  Allows for access of the Ultimaker 3 API with authentication.
@@ -55,7 +55,7 @@ class Ultimaker3:
     def __checkAuth(self):
         if self.__auth_id == "" or self.get("api/v1/auth/verify").status_code != 200:
             print("Auth check failed, requesting new authentication")
-            response = self.post("api/v1/auth/request", data={"application": self.__application, "user": pwd.getpwuid(os.getuid())[0]})
+            response = self.post("api/v1/auth/request", data={"application": self.__application, "user": getuser()})
             if response.status_code != 200:
                 raise RuntimeError("Failed to request new API key")
             data = response.json()
