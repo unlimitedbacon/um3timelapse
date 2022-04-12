@@ -83,6 +83,6 @@ while printing():
 print()
 print(":: Print completed")
 print(":: Encoding video")
-ffmpegcmd = "ffmpeg -r 30 -i " + filenameformat + " -vcodec libx264 -preset veryslow -crf 18 " + options.OUTFILE
+ffmpegcmd = "ffmpeg -r 60 -i " + filenameformat + " -vcodec libx264 -profile:v baseline -level 3.0 -pix_fmt yuv420p " + options.OUTFILE
 print(ffmpegcmd)
 os.system(ffmpegcmd)
